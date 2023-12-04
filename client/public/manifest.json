@@ -1,0 +1,74 @@
+{
+  "short_name": "クロノス学習",
+  "name": "クロノス学習",
+  "description": "クロノス学習システムは、中学校1、2、3年生の学生たちの問題集解説システムです。",
+  "display_override": ["window-controls-overlay"],
+  "screenshots": [
+      {
+      "src": "Screen.png",
+        "sizes": "1919x933",
+        "type": "image/png",
+        "form_factor": "wide",
+        "label": "Wonder Widgets"
+      },
+      {
+        "src": "Screen1.png",
+          "sizes": "1919x933",
+          "type": "image/png",
+          "form_factor": "wide",
+          "label": "Wonder Widgets"
+      },
+      {
+        "src": "Screen.png",
+          "sizes": "1919x933",
+          "type": "image/png",
+          "form_factor": "narrow",
+          "label": "Wonder Widgets"
+        },
+        {
+          "src": "Screen1.png",
+            "sizes": "1919x933",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Wonder Widgets"
+        }
+  ],
+  "icons": [
+    {
+      "src": "favicon64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon24.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "id": "pfmnbfhlkkcfpkiahkgmikogkmlbolnn",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff",
+  "form_factor": "desktop"
+}
