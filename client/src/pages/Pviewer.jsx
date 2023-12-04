@@ -4,8 +4,6 @@ import PDFViewer from "../components/PDFViewer";
 import { Spinner } from "@material-tailwind/react";
 import accessLocal from "../utils/accessLocal";
 import axios from "axios";
-import Toast from "toastwind";
-import "toastwind/dist/style.css";
 import { TokenExpiration } from "../utils/TokenExpiration";
 
 const Pviewer = () => {
@@ -48,7 +46,7 @@ const Pviewer = () => {
         setFile(fileURL);
       })
       .catch((error) => {
-        Toast.show("PDFは存在しません。", { status: "error" });
+        // Toast.show("PDFは存在しません。", { status: "error" });
       });
 
     return () => {
