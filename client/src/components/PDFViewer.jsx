@@ -2,8 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import Toast from "toastwind";
 import "toastwind/dist/style.css";
+import "react-pdf/dist/Page/TextLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+const options = {
+  cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+  cMapPacked: true,
+  scale: 5, // Adjust the scale for rendering
+  renderTextLayer: true, // Enable text smoothing
+  renderMode: "canvas", // Use canvas rendering for better quality
+};
 
 const PDFViewer = ({ pdfFile }) => {
   const [width, setWidth] = useState(0);
@@ -34,11 +42,11 @@ const PDFViewer = ({ pdfFile }) => {
     const updateDimensions = () => {
       const maxWidth = Math.min(
         window.innerWidth * 0.95,
-        (window.innerHeight - 100) * ratio
+        (window.innerHeight - 50) * ratio
       );
 
       const maxHeight = Math.min(
-        window.innerHeight - 100,
+        window.innerHeight - 50,
         (window.innerWidth * 0.95) / ratio
       );
 
@@ -198,45 +206,46 @@ const PDFViewer = ({ pdfFile }) => {
   const handleInputChange = (e) => {
     setSearchText(e.target.value);
   };
-  
-  const isLoading =  renderedPageNumber !== pageNumber;
+
+  const isLoading = renderedPageNumber !== pageNumber;
 
   return (
     <div className="page-center overflow-hidden">
       <div
-        style={{ position: 'relative', width: `${width}px`, height: `${height-5}px`, overflow: 'hidden' }}
+        style={{
+          position: "relative",
+          width: `${width}px`,
+          height: `${height - 5}px`,
+          overflow: "hidden",
+        }}
         onTouchStart={handleSwipe}
         onTouchEnd={handleSwipe}
       >
-        <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess} >
+        <Document
+          file={pdfFile}
+          onLoadSuccess={onDocumentLoadSuccess}
+          options={options}
+        >
           {isLoading && renderedPageNumber ? (
             <Page
               key={renderedPageNumber}
               pageNumber={renderedPageNumber}
-              renderTextLayer={false}
               width={width}
               height={height}
-              renderAnnotationLayer={false}
             />
           ) : null}
           <Page
             key={pageNumber}
             pageNumber={pageNumber}
-            renderTextLayer={false}
             width={width}
             height={height}
-            renderAnnotationLayer={false}
-            onRenderSuccess={
-              ()=>{
-                setRenderedPageNumber(pageNumber);
-              }
-            }
+            onRenderSuccess={() => {
+              setRenderedPageNumber(pageNumber);
+            }}
           />
         </Document>
       </div>
-      <div
-        className={`pt-3 w-[${width}px]`}
-      >
+      <div className={`pt-3 w-[${width}px]`}>
         {isShow ? (
           <div className={`flex justify-center w-[${width}]`}>
             <div className="grid grid-flow-col items-center">
