@@ -192,6 +192,7 @@ const PDFModal = ({ modalIsOpen, crudState, selectedPdf, closeModal }) => {
                 type="file"
                 className='hidden'
                 ref={fileInputRef}
+                accept="application/pdf"
                 onChange={handleFileChange}
               />
               {

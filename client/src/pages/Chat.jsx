@@ -164,7 +164,7 @@ function Chat() {
 
   const handleKeyDown = (e) => {};
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     TokenExpiration();
 
     if (message !== "") {
@@ -172,27 +172,48 @@ function Chat() {
         Toast.show("受信機を選択してください。", { status: "error" });
         return;
       }
+
       if (file && file.type !== "image/jpeg" && file.type !== "image/png") {
         Toast.show("JPGやPNGファイルのみ転送できます。", { status: "error" });
         return;
       }
-      if (file) {
-        const formData = new FormData();
-        const renamedFile = new File([file], file.name + Date.now(), {
-          type: file.type,
-        });
-        formData.append("file", renamedFile);
+
+      // Check file size
+      const maxSizeInBytes = 2 * 1024 * 1024; // 1MB
+      if (file && file.size > maxSizeInBytes) {
+        Toast.show("ファイルサイズは2MB以下である必要があります。", { status: "error" });
+        return;
       }
 
-      socket.emit("chat message", {
-        sender: name,
-        level: level,
-        receiver: level === "user" ? "クロノス事務局" : selectedMember,
-        message: message,
-        image: file
-          ? new File([file], file.name + Date.now(), { type: file.type })
-          : "",
-      });
+      if (file) {
+        const imageBuffer = await fileToArrayBuffer(file);
+        const chunkSize = 64 * 1024; // 64 KB
+        const totalChunks = Math.ceil(imageBuffer.byteLength / chunkSize);
+        const messagedata = {
+          data: { sender: name,
+            level: level,
+            receiver: level === "user" ? "クロノス事務局" : selectedMember,
+            message: message,
+          },
+          totalChunks,
+        };
+        for (let i = 0; i < totalChunks; i++) {
+          const start = i * chunkSize;
+          const end = Math.min(start + chunkSize, imageBuffer.byteLength);
+          const chunk = imageBuffer.slice(start, end);
+          messagedata.chunkIndex = i;
+          socket.emit('image chat message', chunk, messagedata);
+        }
+      } else {        
+        socket.emit("chat message", {
+          sender: name,
+          level: level,
+          receiver: level === "user" ? "クロノス事務局" : selectedMember,
+          message: message,
+          image: "",
+        });
+      }
+
       setMessage("");
       fileInputRef.current.value = null;
       setFile(null);
@@ -274,6 +295,22 @@ function Chat() {
     const month = arr[0];
     const day = arr[1];
     return `${year}-${month}-${day} ${formattedTime}`;
+  };
+
+  const fileToArrayBuffer = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+  
+      reader.onerror = (error) => {
+        reject(error);
+      };
+  
+      reader.readAsArrayBuffer(file);
+    });
   };
 
   const [width, setWidth] = useState(0);
@@ -526,6 +563,7 @@ function Chat() {
                 type="file"
                 className="hidden"
                 ref={fileInputRef}
+                accept="image/png, image/jpeg"
                 onChange={handleFileChange}
               />
               <button

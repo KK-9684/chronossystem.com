@@ -2,17 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import Toast from "toastwind";
 import "toastwind/dist/style.css";
-// Disable text layer rendering
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
 const PDFViewer = ({ pdfFile }) => {
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const [numPages, setNumPages] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
-  const [oldPageNumber, setOldPageNumber] = useState(2);
-  const [isTrans, setIsTrans] = useState(false);
+  const [renderedPageNumber, setRenderedPageNumber] = useState(null);
   const [isShow, setIsShow] = useState(false);
 
   useEffect(() => {
@@ -35,8 +34,9 @@ const PDFViewer = ({ pdfFile }) => {
     const updateDimensions = () => {
       const maxWidth = Math.min(
         window.innerWidth * 0.95,
-        (window.innerHeight - 50) * ratio
+        (window.innerHeight - 100) * ratio
       );
+
       const maxHeight = Math.min(
         window.innerHeight - 100,
         (window.innerWidth * 0.95) / ratio
@@ -56,12 +56,9 @@ const PDFViewer = ({ pdfFile }) => {
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
-
-    setPageNumber(1);
     setTimeout(() => {
-      setOldPageNumber(1);
       setIsShow(true);
-    }, 500);
+    }, 400);
   };
 
   useEffect(() => {
@@ -84,41 +81,16 @@ const PDFViewer = ({ pdfFile }) => {
     // eslint-disable-next-line
   }, [numPages]);
 
-  let fakeIsTrans = false;
   const handlePrevPage = () => {
-    if (fakeIsTrans) {
-      return;
-    }
-    fakeIsTrans = true;
-    setIsTrans(true);
     setPageNumber((prevPageNumber) =>
       prevPageNumber > 1 ? prevPageNumber - 1 : prevPageNumber
     );
-    setTimeout(() => {
-      setOldPageNumber((prevPageNumber) =>
-        prevPageNumber > 1 ? prevPageNumber - 1 : prevPageNumber
-      );
-      setIsTrans(false);
-      fakeIsTrans = false;
-    }, 500);
   };
 
   const handleNextPage = () => {
-    if (fakeIsTrans) {
-      return;
-    }
-    fakeIsTrans = true;
-    setIsTrans(true);
     setPageNumber((prevPageNumber) =>
       prevPageNumber < numPages ? prevPageNumber + 1 : prevPageNumber
     );
-    setTimeout(() => {
-      setOldPageNumber((prevPageNumber) =>
-        prevPageNumber < numPages ? prevPageNumber + 1 : prevPageNumber
-      );
-      setIsTrans(false);
-      fakeIsTrans = false;
-    }, 500);
   };
 
   const handleSwipe = (event) => {
@@ -198,17 +170,7 @@ const PDFViewer = ({ pdfFile }) => {
             const pageText = content.items.map((item) => item.str).join("");
 
             if (pageText.includes(body)) {
-              if (fakeIsTrans) {
-                return;
-              }
-              fakeIsTrans = true;
-              setIsTrans(true);
               setPageNumber(pageNumber);
-              setTimeout(() => {
-                setOldPageNumber(pageNumber);
-                setIsTrans(false);
-                fakeIsTrans = false;
-              }, 500);
               return; // Exit the recursion once the condition is met
             }
 
@@ -236,70 +198,81 @@ const PDFViewer = ({ pdfFile }) => {
   const handleInputChange = (e) => {
     setSearchText(e.target.value);
   };
+  
+  const isLoading =  renderedPageNumber !== pageNumber;
 
   return (
-    <div className="page-center">
+    <div className="page-center overflow-hidden">
       <div
-        className={`pt-3 w-[${width}px] h-[${height}px]`}
+        style={{ position: 'relative', width: `${width}px`, height: `${height-5}px`, overflow: 'hidden' }}
         onTouchStart={handleSwipe}
         onTouchEnd={handleSwipe}
       >
-        <Document
-          file={pdfFile}
-          onLoadSuccess={onDocumentLoadSuccess}
-          options={{ cMapUrl: "cmaps/", cMapPacked: true }}
-        >
+        <Document file={pdfFile} onLoadSuccess={onDocumentLoadSuccess} >
+          {isLoading && renderedPageNumber ? (
+            <Page
+              key={renderedPageNumber}
+              pageNumber={renderedPageNumber}
+              renderTextLayer={false}
+              width={width}
+              height={height}
+              renderAnnotationLayer={false}
+            />
+          ) : null}
           <Page
-            pageNumber={oldPageNumber}
-            width={width}
-            height={height}
-            renderTextLayer={false}
-            className={isTrans ? "" : "hidden"}
-          />
-          <Page
+            key={pageNumber}
             pageNumber={pageNumber}
+            renderTextLayer={false}
             width={width}
             height={height}
-            renderTextLayer={false}
-            className={isTrans ? "hidden" : ""}
+            renderAnnotationLayer={false}
+            onRenderSuccess={
+              ()=>{
+                setRenderedPageNumber(pageNumber);
+              }
+            }
           />
         </Document>
       </div>
-      {isShow ? (
-        <div className={`flex justify-center w-[${width}]`}>
-          <div className="grid grid-flow-col items-center">
-            <div>
-              <span className="mr-2 text-white">問題番号入力:</span>
-              <input
-                type="text"
-                name="search"
-                value={searchText}
-                onChange={handleInputChange}
-                className="rounded-sm p-1 px-2 w-20 mr-2"
-              />
+      <div
+        className={`pt-3 w-[${width}px]`}
+      >
+        {isShow ? (
+          <div className={`flex justify-center w-[${width}]`}>
+            <div className="grid grid-flow-col items-center">
+              <div>
+                <span className="mr-2 text-white">問題番号入力:</span>
+                <input
+                  type="text"
+                  name="search"
+                  value={searchText}
+                  onChange={handleInputChange}
+                  className="rounded-sm p-1 px-2 w-20 mr-2"
+                />
+              </div>
+              <button
+                onClick={() => handleSearch(1)}
+                className="bg-white px-3 py-1 m-1 rounded-sm hover:bg-gray-200 active:bg-gray-500"
+              >
+                検索
+              </button>
+              <button
+                onClick={() => handleSearch(2)}
+                className="bg-white px-3 py-1 m-1 rounded-sm hover:bg-gray-200 active:bg-gray-500"
+              >
+                総合問題から検索
+              </button>
             </div>
-            <button
-              onClick={() => handleSearch(1)}
-              className="bg-white px-3 py-1 m-1 rounded-sm hover:bg-gray-200 active:bg-gray-500"
-            >
-              検索
-            </button>
-            <button
-              onClick={() => handleSearch(2)}
-              className="bg-white px-3 py-1 m-1 rounded-sm hover:bg-gray-200 active:bg-gray-500"
-            >
-              総合問題から検索
-            </button>
+            <div className="absolute right-10 m-2">
+              <span className="text-white py-1 px-2">
+                ページ {pageNumber} / {numPages}
+              </span>
+            </div>
           </div>
-          <div className="absolute right-10 m-2">
-            <span className="text-white py-1 px-2">
-              ページ {pageNumber} / {numPages}
-            </span>
-          </div>
-        </div>
-      ) : (
-        ""
-      )}
+        ) : (
+          ""
+        )}
+      </div>
     </div>
   );
 };

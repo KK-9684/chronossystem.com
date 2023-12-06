@@ -45,9 +45,7 @@ const Pviewer = () => {
         const fileURL = URL.createObjectURL(res.data);
         setFile(fileURL);
       })
-      .catch((error) => {
-        // Toast.show("PDFは存在しません。", { status: "error" });
-      });
+      .catch((error) => {});
 
     return () => {
       source.cancel("Request canceled");

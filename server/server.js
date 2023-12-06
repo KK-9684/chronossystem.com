@@ -1,4 +1,5 @@
 const express = require("express");
+const bodyParser = require('body-parser');
 const cors = require("cors");
 const socketio = require("socket.io");
 const Chat = require("./models/chatModel");
@@ -22,6 +23,9 @@ require("dotenv").config({ path: "./config.env" });
 const port = process.env.PORT || 5000;
 
 const app = express();
+// Increase the payload size limit
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
 app.use(cors());
 
 const server = require("http").Server(app);
@@ -120,60 +124,60 @@ io.on("connection", (socket) => {
   // Handle chat messages
   socket.on("chat message", (data) => {
     const { sender, receiver, level, message, image } = data;
-    const imageName = `${Date.now()}`;
     const newMessage = new Chat({
       sender,
       receiver,
       level,
       message,
-      image: image ? imageName : "",
+      image: "",
     });
-    if (image) {
-      fs.writeFile(
-        process.env.BASE_IMAGE_PATH + imageName,
-        image,
-        (error) => {}
-      );
-    }
 
     newMessage
       .save()
       .then((savedMessage) => {
         if (savedMessage) {
-          //   socket.emit("chat message", savedMessage);
           io.emit("chat message", savedMessage);
-          //   if (level === "user") {
-          //     ChatUser.find({ $or: [{ level: "master" }, { level: "manager" }] })
-          //       .exec()
-          //       .then((users) => {
-          //         if (users.length) {
-          //           for (let i = 0; i < users.length; i++) {
-          //             const socketId = socketSessionMap.get(sessionId);
-          //             io.to(users[i].socket_id).emit(
-          //               "chat message",
-          //               savedMessage
-          //             );
-          //           }
-          //         }
-          //       });
-          //   } else {
-          //     ChatUser.findOne({ name: receiver })
-          //       .exec()
-          //       .then((user) => {
-          //         if (user) {
-          //           console.log(user.socket_id);
-
-          //           socket.to(user.socket_id).emit("chat message", savedMessage);
-          //         }
-          //       });
-          //   }
-        } else {
-          console.log(err);
         }
       })
       .catch((err) => {
         console.log(err);
       });
+  });
+  // Handle image chat messages
+  socket.on("image chat message", (chunk, messagedata) => {
+    if (messagedata.chunkIndex === 0) {
+      receivedChunks = [];
+      receivedMessage = messagedata;
+    }
+    // Store the received chunk
+    receivedChunks[messagedata.chunkIndex] = chunk;
+    // Check if all chunks have been received
+    if (receivedChunks.length === receivedMessage.totalChunks) {
+      // All chunks have been received, process the combined message
+      const imageData = Buffer.concat(receivedChunks);
+      const imageName = Date.now();
+      fs.writeFile(process.env.BASE_IMAGE_PATH + imageName, imageData, 'buffer', (err) => {});
+      // Extract the data and image from the received message
+      const { data } = receivedMessage;  
+      const newMessage = new Chat({
+        sender: data.sender,
+        receiver: data.receiver,
+        level: data.level,
+        message: data.message,
+        image: imageName,
+      });
+  
+      newMessage
+        .save()
+        .then((savedMessage) => {
+          if (savedMessage) {
+            io.emit("chat message", savedMessage);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   });
 
   socket.on("disconnect", () => {});
