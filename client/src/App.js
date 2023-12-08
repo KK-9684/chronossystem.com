@@ -15,10 +15,6 @@ function App() {
   }
 
   useEffect(() => {
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
-
     // Event listener for the online event
     const handleOnline = () => {
       setData({
@@ -46,21 +42,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (Notification.permission === "granted") {
-      if (data.title === "オンライン") {
-        if (!offlineState) {
-          return;
-        }
-        setModalIsOpen(true);
-        setTimeout(() => {
-          setModalIsOpen(false);
-        }, 3000);
-      } else if (data.title === "オフライン") {
-        setModalIsOpen(true);
-        setTimeout(() => {
-          setModalIsOpen(false);
-        }, 3000);
+    if (data.title === "オンライン") {
+      if (!offlineState) {
+        return;
       }
+      setModalIsOpen(true);
+      setTimeout(() => {
+        setModalIsOpen(false);
+      }, 3000);
+    } else if (data.title === "オフライン") {
+      setModalIsOpen(true);
+      setTimeout(() => {
+        setModalIsOpen(false);
+      }, 3000);
     }
   }, [data.title]);
 

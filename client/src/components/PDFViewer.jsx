@@ -3,12 +3,13 @@ import { Document, Page, pdfjs } from "react-pdf";
 import Toast from "toastwind";
 import "toastwind/dist/style.css";
 import "react-pdf/dist/Page/TextLayer.css";
+import "react-pdf/dist/Page/AnnotationLayer.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 const options = {
   cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
   cMapPacked: true,
-  scale: 5, // Adjust the scale for rendering
+  // scale: 5, // Adjust the scale for rendering
   renderTextLayer: true, // Enable text smoothing
   renderMode: "canvas", // Use canvas rendering for better quality
 };
@@ -214,7 +215,6 @@ const PDFViewer = ({ pdfFile }) => {
       <div
         style={{
           position: "relative",
-          width: `${width}px`,
           height: `${height - 5}px`,
           overflow: "hidden",
         }}
@@ -230,15 +230,15 @@ const PDFViewer = ({ pdfFile }) => {
             <Page
               key={renderedPageNumber}
               pageNumber={renderedPageNumber}
-              width={width}
               height={height}
+              renderAnnotationLayer={false}
             />
           ) : null}
           <Page
             key={pageNumber}
             pageNumber={pageNumber}
-            width={width}
             height={height}
+            renderAnnotationLayer={false}
             onRenderSuccess={() => {
               setRenderedPageNumber(pageNumber);
             }}

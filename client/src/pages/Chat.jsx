@@ -24,6 +24,7 @@ let selectedMember = "";
 const socket = io("https://www.chronossystem.com", {
   path: "/api/socket.io",
   transports: ["xhr-polling", "polling"],
+  // transports: ["websocket"],
   reconnection: true,
   reconnectionDelay: 1000,
   reconnectionDelayMax: 5000,
@@ -134,8 +135,9 @@ function Chat() {
       }, 500);
       return;
     }
+
     setTimeout(() => {
-      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      scrollContainer.scrollTo({ top: scrollContainer.scrollHeight });
     }, 250);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,7 +183,9 @@ function Chat() {
       // Check file size
       const maxSizeInBytes = 2 * 1024 * 1024; // 1MB
       if (file && file.size > maxSizeInBytes) {
-        Toast.show("ファイルサイズは2MB以下である必要があります。", { status: "error" });
+        Toast.show("ファイルサイズは2MB以下である必要があります。", {
+          status: "error",
+        });
         return;
       }
 
@@ -190,7 +194,8 @@ function Chat() {
         const chunkSize = 64 * 1024; // 64 KB
         const totalChunks = Math.ceil(imageBuffer.byteLength / chunkSize);
         const messagedata = {
-          data: { sender: name,
+          data: {
+            sender: name,
             level: level,
             receiver: level === "user" ? "クロノス事務局" : selectedMember,
             message: message,
@@ -202,9 +207,9 @@ function Chat() {
           const end = Math.min(start + chunkSize, imageBuffer.byteLength);
           const chunk = imageBuffer.slice(start, end);
           messagedata.chunkIndex = i;
-          socket.emit('image chat message', chunk, messagedata);
+          socket.emit("image chat message", chunk, messagedata);
         }
-      } else {        
+      } else {
         socket.emit("chat message", {
           sender: name,
           level: level,
@@ -300,15 +305,15 @@ function Chat() {
   const fileToArrayBuffer = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-  
+
       reader.onload = () => {
         resolve(reader.result);
       };
-  
+
       reader.onerror = (error) => {
         reject(error);
       };
-  
+
       reader.readAsArrayBuffer(file);
     });
   };
