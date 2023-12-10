@@ -230,14 +230,22 @@ const PDFViewer = ({ pdfFile }) => {
             <Page
               key={renderedPageNumber}
               pageNumber={renderedPageNumber}
-              height={height}
+              scale={1}
+              devicePixelRatio={2.0}
+              canvasBackground='#000000'
+              width={width}
+              // height={height}
               renderAnnotationLayer={false}
             />
           ) : null}
           <Page
             key={pageNumber}
             pageNumber={pageNumber}
-            height={height}
+            scale={1}
+            devicePixelRatio={2.0}
+            canvasBackground='#000000'
+            width={width}
+            // height={height}
             renderAnnotationLayer={false}
             onRenderSuccess={() => {
               setRenderedPageNumber(pageNumber);
