@@ -26,6 +26,7 @@
     "react-router": "^6.18.0",
     "react-router-dom": "^6.17.0",
     "react-scripts": "5.0.1",
+    "react-scrollbars-custom": "^4.1.1",
     "react-use-pwa-install": "^0.2.4",
     "react-vimeo": "^2.0.0",
     "redux": "^4.2.1",

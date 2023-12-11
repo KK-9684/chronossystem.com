@@ -1,25 +1,4 @@
-@import 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css';
-
-/* Firefox */
-* {
-  scrollbar-width: 10px;
-  scrollbar-color: #e5e7eb #9ca3af;
-}
-
-/* Chrome, Edge, and Safari */
-*::-webkit-scrollbar {
-  width: 10px;
-}
-
-*::-webkit-scrollbar-track {
-  background: #e5e7eb;
-  border-radius: 5px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #1B75B1;
-  border-radius: 5px;
-}
+@import "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css";
 
 .App {
   text-align: center;

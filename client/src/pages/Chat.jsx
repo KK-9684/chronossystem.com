@@ -8,6 +8,7 @@ import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import saveAs from "file-saver";
 import { TokenExpiration } from "../utils/TokenExpiration";
+import { Scrollbar } from "react-scrollbars-custom";
 
 let count = 0;
 let memberChanged = false;
@@ -43,7 +44,6 @@ function Chat() {
   const scrollContainerRef = useRef(null);
   const [prevScrollHeight, setPrevScrollHeight] = useState(0);
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false);
-  const scrollContainer = scrollContainerRef.current;
 
   useEffect(() => {
     TokenExpiration();
@@ -85,10 +85,18 @@ function Chat() {
     socket.on("more data", (data) => {
       if (level === "user") {
         const reverseData = data.messages.reverse();
+        if (reverseData.length === 0) {
+          setIsLoadingMoreData(false);
+          return;
+        }
         setMessages((prevMessages) => reverseData.concat(prevMessages));
       } else {
         if (data.name === selectedMember) {
           const reverseData = data.messages.reverse();
+          if (reverseData.length === 0) {
+            setIsLoadingMoreData(false);
+            return;
+          }
           if (memberChanged) {
             setMessages(reverseData);
             memberChanged = false;
@@ -124,12 +132,13 @@ function Chat() {
     if (messages.length === 0) {
       return;
     }
+    const scrollContainer = scrollContainerRef.current;
 
     if (isLoadingMoreData) {
       setTimeout(() => {
         const newScrollPosition =
           scrollContainer.scrollHeight - prevScrollHeight;
-        scrollContainer.scrollTo({ top: newScrollPosition - 200 });
+        scrollContainer.scrollTop = newScrollPosition - 200;
         setPrevScrollHeight(scrollContainer.scrollHeight);
         setIsLoadingMoreData(false);
       }, 500);
@@ -137,32 +146,47 @@ function Chat() {
     }
 
     setTimeout(() => {
-      scrollContainer.scrollTo({ top: scrollContainer.scrollHeight });
-    }, 250);
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+    }, 0);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const scrollContainer = scrollContainerRef.current;
+  //   const handleScroll = () => {
+  //     if (scrollContainer.scrollTop === 0 && !isLoadingMoreData) {
+  //       setIsLoadingMoreData(true);
+  //       count = count + 10;
+  //       TokenExpiration();
+  //       socket.emit("more data", {
+  //         name: level === "user" ? name : selectedMember,
+  //         count: count,
+  //       });
+  //     }
+  //   };
+  //   setPrevScrollHeight(scrollContainer.scrollHeight);
+  //   scrollContainer.addEventListener("scroll", handleScroll);
+  //   return () => {
+  //     scrollContainer.removeEventListener("scroll", handleScroll);
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [isLoadingMoreData]);
+
+  const handleScroll = (e) => {
     const scrollContainer = scrollContainerRef.current;
-    const handleScroll = () => {
-      if (scrollContainer.scrollTop === 0 && !isLoadingMoreData) {
-        setIsLoadingMoreData(true);
-        count = count + 10;
-        TokenExpiration();
-        socket.emit("more data", {
-          name: level === "user" ? name : selectedMember,
-          count: count,
-        });
-      }
-    };
+
+    if (scrollContainer.scrollTop === 0 && !isLoadingMoreData) {
+      setIsLoadingMoreData(true);
+      count = count + 10;
+      TokenExpiration();
+      socket.emit("more data", {
+        name: level === "user" ? name : selectedMember,
+        count: count,
+      });
+    }
     setPrevScrollHeight(scrollContainer.scrollHeight);
-    scrollContainer.addEventListener("scroll", handleScroll);
-    return () => {
-      scrollContainer.removeEventListener("scroll", handleScroll);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoadingMoreData]);
+  };
 
   const handleKeyDown = (e) => {};
 
@@ -333,6 +357,8 @@ function Chat() {
     // eslint-disable-next-line
   }, []);
 
+  const containerHeight = window.innerHeight > 1000 ? "70vh" : "64vh";
+
   return (
     <div>
       <div
@@ -395,164 +421,168 @@ function Chat() {
             </div>
           )}
           <div className="w-[650px] pointer-events-auto">
-            <div
+            <Scrollbar
+              noScrollX
               ref={scrollContainerRef}
-              className={`${
-                window.innerHeight > 1000 ? "h-[70vh]" : "h-[64vh]"
-              } overflow-y-auto overflow-x-hidden pb-10 px-7 scroll-container`}
+              style={{
+                height: containerHeight,
+              }}
+              onScroll={handleScroll}
             >
-              {level === "user"
-                ? messages.map((msg, index) =>
-                    msg.level === "user" ? (
-                      <div key={index}>
-                        <div className="justify-self-end grid grid-flow-col items-end justify-end">
-                          <div className="text-md text-white float-right mb-2 mr-2">
-                            {convertDate(msg.created)}
-                          </div>
-                          <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
-                            <div className="text-base font-bold text-right">
-                              {msg.sender}
+              <div className="scroll-container pb-10 px-7">
+                {level === "user"
+                  ? messages.map((msg, index) =>
+                      msg.level === "user" ? (
+                        <div key={index}>
+                          <div className="justify-self-end grid grid-flow-col items-end justify-end">
+                            <div className="text-md text-white float-right mb-2 mr-2">
+                              {convertDate(msg.created)}
                             </div>
-                            <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                              <span>{msg.message}</span>
+                            <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
+                              <div className="text-base font-bold text-right">
+                                {msg.sender}
+                              </div>
+                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                <span>{msg.message}</span>
+                              </div>
                             </div>
                           </div>
+                          {msg.image === "" ? (
+                            ""
+                          ) : (
+                            <div className="grid justify-items-end grid-flow-col justify-end items-end">
+                              <button
+                                onClick={() =>
+                                  handleDownload(msg.image, msg.sender)
+                                }
+                              >
+                                <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
+                              </button>
+                              <Zoom classDialog={"custom-zoom"}>
+                                <img
+                                  src={getImage(msg.image)}
+                                  className="max-w-[350px] rounded-2xl"
+                                  alt={msg.sender}
+                                />
+                              </Zoom>
+                            </div>
+                          )}
                         </div>
-                        {msg.image === "" ? (
-                          ""
-                        ) : (
-                          <div className="grid justify-items-end grid-flow-col justify-end items-end">
-                            <button
-                              onClick={() =>
-                                handleDownload(msg.image, msg.sender)
-                              }
-                            >
-                              <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
-                            </button>
-                            <Zoom classDialog={"custom-zoom"}>
-                              <img
-                                src={getImage(msg.image)}
-                                className="max-w-[350px] rounded-2xl"
-                                alt={msg.sender}
-                              />
-                            </Zoom>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div key={index}>
-                        <div className="justify-self-start grid grid-flow-col items-end justify-start">
-                          <div className="bg-white p-[15px] my-2 rounded-2xl">
-                            <div className="text-base font-bold">
-                              クロノス事務局
+                      ) : (
+                        <div key={index}>
+                          <div className="justify-self-start grid grid-flow-col items-end justify-start">
+                            <div className="bg-white p-[15px] my-2 rounded-2xl">
+                              <div className="text-base font-bold">
+                                クロノス事務局
+                              </div>
+                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                <span>{msg.message}</span>
+                              </div>
                             </div>
-                            <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                              <span>{msg.message}</span>
+                            <div className="text-md text-white float-left mb-2 ml-2">
+                              {convertDate(msg.created)}
                             </div>
                           </div>
-                          <div className="text-md text-white float-left mb-2 ml-2">
-                            {convertDate(msg.created)}
-                          </div>
+                          {msg.image === "" ? (
+                            ""
+                          ) : (
+                            <div className="grid justify-items-start grid-flow-col justify-start items-end">
+                              <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
+                                <img
+                                  src={getImage(msg.image)}
+                                  className="max-w-[350px] rounded-2xl"
+                                  alt={msg.sender}
+                                />
+                              </Zoom>
+                              <button
+                                onClick={() =>
+                                  handleDownload(msg.image, msg.sender)
+                                }
+                              >
+                                <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        {msg.image === "" ? (
-                          ""
-                        ) : (
-                          <div className="grid justify-items-start grid-flow-col justify-start items-end">
-                            <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
-                              <img
-                                src={getImage(msg.image)}
-                                className="max-w-[350px] rounded-2xl"
-                                alt={msg.sender}
-                              />
-                            </Zoom>
-                            <button
-                              onClick={() =>
-                                handleDownload(msg.image, msg.sender)
-                              }
-                            >
-                              <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      )
                     )
-                  )
-                : messages.map((msg, index) =>
-                    msg.level === "manager" || msg.level === "master" ? (
-                      <div key={index}>
-                        <div className="justify-self-end grid grid-flow-col items-end justify-end">
-                          <div className="text-md text-white float-right mb-2 mr-2">
-                            {convertDate(msg.created)}
-                          </div>
-                          <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
-                            <div className="text-base font-bold text-right">
-                              クロノス事務局
+                  : messages.map((msg, index) =>
+                      msg.level === "manager" || msg.level === "master" ? (
+                        <div key={index}>
+                          <div className="justify-self-end grid grid-flow-col items-end justify-end">
+                            <div className="text-md text-white float-right mb-2 mr-2">
+                              {convertDate(msg.created)}
                             </div>
-                            <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                              <span>{msg.message}</span>
+                            <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
+                              <div className="text-base font-bold text-right">
+                                クロノス事務局
+                              </div>
+                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                <span>{msg.message}</span>
+                              </div>
                             </div>
                           </div>
+                          {msg.image === "" ? (
+                            ""
+                          ) : (
+                            <div className="grid justify-items-end grid-flow-col justify-end items-end">
+                              <button
+                                onClick={() =>
+                                  handleDownload(msg.image, msg.sender)
+                                }
+                              >
+                                <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
+                              </button>
+                              <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
+                                <img
+                                  src={getImage(msg.image)}
+                                  className="max-w-[350px] float-right rounded-2xl"
+                                  alt={msg.sender}
+                                />
+                              </Zoom>
+                            </div>
+                          )}
                         </div>
-                        {msg.image === "" ? (
-                          ""
-                        ) : (
-                          <div className="grid justify-items-end grid-flow-col justify-end items-end">
-                            <button
-                              onClick={() =>
-                                handleDownload(msg.image, msg.sender)
-                              }
-                            >
-                              <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
-                            </button>
-                            <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
-                              <img
-                                src={getImage(msg.image)}
-                                className="max-w-[350px] float-right rounded-2xl"
-                                alt={msg.sender}
-                              />
-                            </Zoom>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div key={index}>
-                        <div className="justify-self-start grid grid-flow-col items-end justify-start">
-                          <div className="bg-white p-[15px] my-2 rounded-2xl">
-                            <div className="text-base font-bold">
-                              {msg.sender}
+                      ) : (
+                        <div key={index}>
+                          <div className="justify-self-start grid grid-flow-col items-end justify-start">
+                            <div className="bg-white p-[15px] my-2 rounded-2xl">
+                              <div className="text-base font-bold">
+                                {msg.sender}
+                              </div>
+                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                <span>{msg.message}</span>
+                              </div>
                             </div>
-                            <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                              <span>{msg.message}</span>
+                            <div className="text-md text-white float-left mb-2 ml-2">
+                              {convertDate(msg.created)}
                             </div>
                           </div>
-                          <div className="text-md text-white float-left mb-2 ml-2">
-                            {convertDate(msg.created)}
-                          </div>
+                          {msg.image === "" ? (
+                            ""
+                          ) : (
+                            <div className="grid justify-items-start grid-flow-col justify-start items-end">
+                              <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
+                                <img
+                                  src={getImage(msg.image)}
+                                  className="max-w-[350px] rounded-2xl"
+                                  alt={msg.sender}
+                                />
+                              </Zoom>
+                              <button
+                                onClick={() =>
+                                  handleDownload(msg.image, msg.sender)
+                                }
+                              >
+                                <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        {msg.image === "" ? (
-                          ""
-                        ) : (
-                          <div className="grid justify-items-start grid-flow-col justify-start items-end">
-                            <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
-                              <img
-                                src={getImage(msg.image)}
-                                className="max-w-[350px] rounded-2xl"
-                                alt={msg.sender}
-                              />
-                            </Zoom>
-                            <button
-                              onClick={() =>
-                                handleDownload(msg.image, msg.sender)
-                              }
-                            >
-                              <i className="fa fa-download text-cblue hover:text-indigo-700 m-1"></i>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  )}
-            </div>
+                      )
+                    )}
+              </div>
+            </Scrollbar>
             <div className="mt-5">
               {level !== "user" && window.innerWidth < 1024 ? (
                 <button
