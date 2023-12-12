@@ -193,7 +193,7 @@ function Chat() {
   const sendMessage = async () => {
     TokenExpiration();
 
-    if (message !== "") {
+    if (message !== "" || file) {
       if (level !== "user" && selectedMember === "") {
         Toast.show("受信機を選択してください。", { status: "error" });
         return;
@@ -434,23 +434,25 @@ function Chat() {
                   ? messages.map((msg, index) =>
                       msg.level === "user" ? (
                         <div key={index}>
-                          <div className="justify-self-end grid grid-flow-col items-end justify-end">
-                            <div className="text-md text-white float-right mb-2 mr-2">
-                              {convertDate(msg.created)}
-                            </div>
-                            <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
-                              <div className="text-base font-bold text-right">
-                                {msg.sender}
+                          {msg.message && (
+                            <div className="justify-self-end grid grid-flow-col items-end justify-end">
+                              <div className="text-md text-white float-right mb-2 mr-2">
+                                {convertDate(msg.created)}
                               </div>
-                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                                <span>{msg.message}</span>
+                              <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
+                                <div className="text-base font-bold text-right">
+                                  {msg.sender}
+                                </div>
+                                <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                  <span>{msg.message}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          )}
                           {msg.image === "" ? (
                             ""
                           ) : (
-                            <div className="grid justify-items-end grid-flow-col justify-end items-end">
+                            <div className="grid justify-items-end grid-flow-col justify-end items-end mb-2">
                               <button
                                 onClick={() =>
                                   handleDownload(msg.image, msg.sender)
@@ -461,7 +463,7 @@ function Chat() {
                               <Zoom classDialog={"custom-zoom"}>
                                 <img
                                   src={getImage(msg.image)}
-                                  className="max-w-[350px] rounded-2xl"
+                                  className="max-w-[300px] rounded-2xl"
                                   alt={msg.sender}
                                 />
                               </Zoom>
@@ -470,27 +472,29 @@ function Chat() {
                         </div>
                       ) : (
                         <div key={index}>
-                          <div className="justify-self-start grid grid-flow-col items-end justify-start">
-                            <div className="bg-white p-[15px] my-2 rounded-2xl">
-                              <div className="text-base font-bold">
-                                クロノス事務局
+                          {msg.message && (
+                            <div className="justify-self-start grid grid-flow-col items-end justify-start">
+                              <div className="bg-white p-[15px] my-2 rounded-2xl">
+                                <div className="text-base font-bold">
+                                  クロノス事務局
+                                </div>
+                                <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                  <span>{msg.message}</span>
+                                </div>
                               </div>
-                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                                <span>{msg.message}</span>
+                              <div className="text-md text-white float-left mb-2 ml-2">
+                                {convertDate(msg.created)}
                               </div>
                             </div>
-                            <div className="text-md text-white float-left mb-2 ml-2">
-                              {convertDate(msg.created)}
-                            </div>
-                          </div>
+                          )}
                           {msg.image === "" ? (
                             ""
                           ) : (
-                            <div className="grid justify-items-start grid-flow-col justify-start items-end">
+                            <div className="grid justify-items-start grid-flow-col justify-start items-end mb-2">
                               <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
                                 <img
                                   src={getImage(msg.image)}
-                                  className="max-w-[350px] rounded-2xl"
+                                  className="max-w-[300px] rounded-2xl"
                                   alt={msg.sender}
                                 />
                               </Zoom>
@@ -509,23 +513,25 @@ function Chat() {
                   : messages.map((msg, index) =>
                       msg.level === "manager" || msg.level === "master" ? (
                         <div key={index}>
-                          <div className="justify-self-end grid grid-flow-col items-end justify-end">
-                            <div className="text-md text-white float-right mb-2 mr-2">
-                              {convertDate(msg.created)}
-                            </div>
-                            <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
-                              <div className="text-base font-bold text-right">
-                                クロノス事務局
+                          {msg.message && (
+                            <div className="justify-self-end grid grid-flow-col items-end justify-end">
+                              <div className="text-md text-white float-right mb-2 mr-2">
+                                {convertDate(msg.created)}
                               </div>
-                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                                <span>{msg.message}</span>
+                              <div className="bg-[#00D34D] p-[15px] my-2 rounded-2xl">
+                                <div className="text-base font-bold text-right">
+                                  クロノス事務局
+                                </div>
+                                <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                  <span>{msg.message}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          )}
                           {msg.image === "" ? (
                             ""
                           ) : (
-                            <div className="grid justify-items-end grid-flow-col justify-end items-end">
+                            <div className="grid justify-items-end grid-flow-col justify-end items-end mb-2">
                               <button
                                 onClick={() =>
                                   handleDownload(msg.image, msg.sender)
@@ -536,7 +542,7 @@ function Chat() {
                               <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
                                 <img
                                   src={getImage(msg.image)}
-                                  className="max-w-[350px] float-right rounded-2xl"
+                                  className="max-w-[300px] float-right rounded-2xl"
                                   alt={msg.sender}
                                 />
                               </Zoom>
@@ -545,27 +551,29 @@ function Chat() {
                         </div>
                       ) : (
                         <div key={index}>
-                          <div className="justify-self-start grid grid-flow-col items-end justify-start">
-                            <div className="bg-white p-[15px] my-2 rounded-2xl">
-                              <div className="text-base font-bold">
-                                {msg.sender}
+                          {msg.message && (
+                            <div className="justify-self-start grid grid-flow-col items-end justify-start">
+                              <div className="bg-white p-[15px] my-2 rounded-2xl">
+                                <div className="text-base font-bold">
+                                  {msg.sender}
+                                </div>
+                                <div className="max-w-[350px] break-words whitespace-pre-wrap">
+                                  <span>{msg.message}</span>
+                                </div>
                               </div>
-                              <div className="max-w-[350px] break-words whitespace-pre-wrap">
-                                <span>{msg.message}</span>
+                              <div className="text-md text-white float-left mb-2 ml-2">
+                                {convertDate(msg.created)}
                               </div>
                             </div>
-                            <div className="text-md text-white float-left mb-2 ml-2">
-                              {convertDate(msg.created)}
-                            </div>
-                          </div>
+                          )}
                           {msg.image === "" ? (
                             ""
                           ) : (
-                            <div className="grid justify-items-start grid-flow-col justify-start items-end">
+                            <div className="grid justify-items-start grid-flow-col justify-start items-end mb-2">
                               <Zoom zoomMargin={60} classDialog={"custom-zoom"}>
                                 <img
                                   src={getImage(msg.image)}
-                                  className="max-w-[350px] rounded-2xl"
+                                  className="max-w-[300px] rounded-2xl"
                                   alt={msg.sender}
                                 />
                               </Zoom>
