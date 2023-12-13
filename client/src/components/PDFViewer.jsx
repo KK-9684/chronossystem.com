@@ -10,7 +10,7 @@ const options = {
   cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
   cMapPacked: true,
   // scale: 5, // Adjust the scale for rendering
-  renderTextLayer: true, // Enable text smoothing
+  renderTextLayer: false, // Enable text smoothing
   renderMode: "canvas", // Use canvas rendering for better quality
 };
 
@@ -231,22 +231,24 @@ const PDFViewer = ({ pdfFile }) => {
               key={renderedPageNumber}
               pageNumber={renderedPageNumber}
               scale={1}
-              devicePixelRatio={width >= 820 ? 2.0 : 1.0}
+              devicePixelRatio={1.03}
               canvasBackground="#000000"
               width={width}
               // height={height}
               renderAnnotationLayer={false}
+              renderTextLayer={false}
             />
           ) : null}
           <Page
             key={pageNumber}
             pageNumber={pageNumber}
             scale={1}
-            devicePixelRatio={width >= 820 ? 2.0 : 1.0}
+            devicePixelRatio={1.03}
             canvasBackground="#000000"
             width={width}
             // height={height}
             renderAnnotationLayer={false}
+            renderTextLayer={false}
             onRenderSuccess={() => {
               setRenderedPageNumber(pageNumber);
             }}
