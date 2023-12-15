@@ -139,6 +139,7 @@ function Chat() {
         const newScrollPosition =
           scrollContainer.scrollHeight - prevScrollHeight;
         scrollContainer.scrollTop = newScrollPosition - 200;
+        console.log(2, scrollContainer.scrollHeight);
         setPrevScrollHeight(scrollContainer.scrollHeight);
         setIsLoadingMoreData(false);
       }, 500);
@@ -146,7 +147,10 @@ function Chat() {
     }
 
     setTimeout(() => {
-      scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      if (scrollContainer.scrollHeight > 300) {
+        console.log(1, scrollContainer.scrollHeight);
+        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+      }
     }, 0);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -374,7 +378,7 @@ function Chat() {
               <div
                 className={`${
                   window.innerHeight > 1000 ? "h-[67vh]" : "h-[62vh]"
-                } w-[300px] bg-white shadow-xl overflow-y-auto px-3 py-5 rounded-2xl mr-10 pointer-events-auto absolute top-16 ${
+                } w-[300px] bg-white shadow-xl overflow-y-auto z-20 px-3 py-5 rounded-2xl mr-10 pointer-events-auto absolute top-16 ${
                   isList ? "" : "hidden"
                 }`}
               >
@@ -386,7 +390,7 @@ function Chat() {
                         member._id === selectedMember
                           ? "bg-cyan-300"
                           : "bg-gray-200"
-                      } text-gray-900 cursor-pointer hover:bg-cyan-200 p-1 rounded mb-1`}
+                      } text-gray-900 cursor-pointer hover:bg-cyan-200 p-1 rounded mb-1 z-50`}
                       onClick={() => handleMemberChange(member._id)}
                     >
                       <i className="fa fa-user mr-1"></i>
