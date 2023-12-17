@@ -34,7 +34,7 @@ const Problem = () => {
               <div className="text-xl m-3 font-bold text-cblue">
                 体系問題集 数学１
               </div>
-              <div className="text-4xl m-3 mr-10 font-bold ">代数編 発展</div>
+              <div className="text-4xl m-3 mr-12 font-bold ">代数編 発展</div>
             </div>
           </button>
           <button
@@ -45,7 +45,7 @@ const Problem = () => {
               <div className="text-xl m-3 font-bold text-cblue">
                 体系問題集 数学１
               </div>
-              <div className="text-4xl m-3 mr-10 font-bold ">幾何編 発展</div>
+              <div className="text-4xl m-3 mr-12 font-bold ">幾何編 発展</div>
             </div>
           </button>
           <button
@@ -56,7 +56,7 @@ const Problem = () => {
               <div className="text-xl m-3 font-bold text-cblue">
                 体系問題集 数学２
               </div>
-              <div className="text-4xl m-3 mr-10 font-bold ">代数編 発展</div>
+              <div className="text-4xl m-3 mr-12 font-bold ">代数編 発展</div>
             </div>
           </button>
           <button
@@ -67,7 +67,7 @@ const Problem = () => {
               <div className="text-xl m-3 font-bold text-cblue">
                 体系問題集 数学２
               </div>
-              <div className="text-4xl m-3 mr-10 font-bold ">幾何編 発展</div>
+              <div className="text-4xl m-3 mr-12 font-bold ">幾何編 発展</div>
             </div>
           </button>
         </div>

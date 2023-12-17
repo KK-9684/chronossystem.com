@@ -42,8 +42,8 @@ function Chat() {
   const [members, setMembers] = useState([]);
   const [isList, setIsList] = useState(false);
   const scrollContainerRef = useRef(null);
-  const [prevScrollHeight, setPrevScrollHeight] = useState(0);
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false);
+  const [prevScrollHeight, setPrevScrollHeight] = useState(0);
 
   useEffect(() => {
     TokenExpiration();
@@ -64,9 +64,6 @@ function Chat() {
         if (data.receiver === name || data.sender === name) {
           setMessages((prevMessages) => [...prevMessages, data]);
         }
-        // if (level !== "user" && selectedMember === "") {
-        //   return;
-        // }
       } else {
         if (data.receiver === "クロノス事務局") {
           if (selectedMember === data.sender) {
@@ -135,47 +132,17 @@ function Chat() {
     const scrollContainer = scrollContainerRef.current;
 
     if (isLoadingMoreData) {
-      setTimeout(() => {
-        const newScrollPosition =
-          scrollContainer.scrollHeight - prevScrollHeight;
-        scrollContainer.scrollTop = newScrollPosition - 200;
-        console.log(2, scrollContainer.scrollHeight);
-        setPrevScrollHeight(scrollContainer.scrollHeight);
-        setIsLoadingMoreData(false);
-      }, 500);
+      const newScrollPosition = scrollContainer.scrollHeight - prevScrollHeight;
+      scrollContainer.scrollTop = newScrollPosition - 200;
+      setPrevScrollHeight(scrollContainer.scrollHeight);
+      setIsLoadingMoreData(false);
       return;
     }
 
-    setTimeout(() => {
-      if (scrollContainer.scrollHeight > 300) {
-        console.log(1, scrollContainer.scrollHeight);
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
-    }, 0);
+    scrollContainer.scrollTop = scrollContainer.scrollHeight;
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length]);
-
-  // useEffect(() => {
-  //   const scrollContainer = scrollContainerRef.current;
-  //   const handleScroll = () => {
-  //     if (scrollContainer.scrollTop === 0 && !isLoadingMoreData) {
-  //       setIsLoadingMoreData(true);
-  //       count = count + 10;
-  //       TokenExpiration();
-  //       socket.emit("more data", {
-  //         name: level === "user" ? name : selectedMember,
-  //         count: count,
-  //       });
-  //     }
-  //   };
-  //   setPrevScrollHeight(scrollContainer.scrollHeight);
-  //   scrollContainer.addEventListener("scroll", handleScroll);
-  //   return () => {
-  //     scrollContainer.removeEventListener("scroll", handleScroll);
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [isLoadingMoreData]);
 
   const handleScroll = (e) => {
     const scrollContainer = scrollContainerRef.current;
@@ -227,6 +194,8 @@ function Chat() {
             level: level,
             receiver: level === "user" ? "クロノス事務局" : selectedMember,
             message: message,
+            width: size.width,
+            height: size.height,
           },
           totalChunks,
         };
@@ -244,6 +213,8 @@ function Chat() {
           receiver: level === "user" ? "クロノス事務局" : selectedMember,
           message: message,
           image: "",
+          width: "",
+          height: "",
         });
       }
 
@@ -302,10 +273,35 @@ function Chat() {
   };
 
   const [file, setFile] = useState(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
 
   const handleFileChange = (event) => {
     if (event.target.files.length !== 0) {
       const selectedFile = event.target.files[0];
+
+      // Create a FileReader
+      const reader = new FileReader();
+
+      // Set up the FileReader onload event handler
+      reader.onload = (e) => {
+        const image = new Image();
+        image.src = e.target.result;
+
+        // Once the image is loaded, you can access its dimensions
+        image.onload = () => {
+          let width = image.width;
+          let height = image.height;
+          if (width > 300) {
+            width = 300;
+            height = Math.floor((300 * image.height) / image.width);
+          }
+          setSize((prev) => ({ ...prev, width, height }));
+        };
+      };
+
+      // Read the selected file as a data URL
+      reader.readAsDataURL(selectedFile);
+
       setFile(selectedFile);
     }
   };
@@ -469,6 +465,8 @@ function Chat() {
                                   src={getImage(msg.image)}
                                   className="max-w-[300px] rounded-2xl"
                                   alt={msg.sender}
+                                  width={msg.width}
+                                  height={msg.height}
                                 />
                               </Zoom>
                             </div>
@@ -500,6 +498,8 @@ function Chat() {
                                   src={getImage(msg.image)}
                                   className="max-w-[300px] rounded-2xl"
                                   alt={msg.sender}
+                                  width={msg.width}
+                                  height={msg.height}
                                 />
                               </Zoom>
                               <button
@@ -548,6 +548,8 @@ function Chat() {
                                   src={getImage(msg.image)}
                                   className="max-w-[300px] float-right rounded-2xl"
                                   alt={msg.sender}
+                                  width={msg.width}
+                                  height={msg.height}
                                 />
                               </Zoom>
                             </div>
@@ -578,6 +580,8 @@ function Chat() {
                                 <img
                                   src={getImage(msg.image)}
                                   className="max-w-[300px] rounded-2xl"
+                                  width={msg.width}
+                                  height={msg.height}
                                   alt={msg.sender}
                                 />
                               </Zoom>

@@ -1,5 +1,5 @@
 const express = require("express");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const socketio = require("socket.io");
 const Chat = require("./models/chatModel");
@@ -24,8 +24,8 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 // Increase the payload size limit
-app.use(bodyParser.json({ limit: '5mb' }));
-app.use(bodyParser.urlencoded({ limit: '5mb', extended: true }));
+app.use(bodyParser.json({ limit: "5mb" }));
+app.use(bodyParser.urlencoded({ limit: "5mb", extended: true }));
 app.use(cors());
 
 const server = require("http").Server(app);
@@ -123,13 +123,15 @@ io.on("connection", (socket) => {
 
   // Handle chat messages
   socket.on("chat message", (data) => {
-    const { sender, receiver, level, message, image } = data;
+    const { sender, receiver, level, message } = data;
     const newMessage = new Chat({
       sender,
       receiver,
       level,
       message,
       image: "",
+      width: "",
+      height: "",
     });
 
     newMessage
@@ -156,17 +158,24 @@ io.on("connection", (socket) => {
       // All chunks have been received, process the combined message
       const imageData = Buffer.concat(receivedChunks);
       const imageName = Date.now();
-      fs.writeFile(process.env.BASE_IMAGE_PATH + imageName, imageData, 'buffer', (err) => {});
+      fs.writeFile(
+        process.env.BASE_IMAGE_PATH + imageName,
+        imageData,
+        "buffer",
+        (err) => {}
+      );
       // Extract the data and image from the received message
-      const { data } = receivedMessage;  
+      const { data } = receivedMessage;
       const newMessage = new Chat({
         sender: data.sender,
         receiver: data.receiver,
         level: data.level,
         message: data.message,
         image: imageName,
+        width: data.width,
+        height: data.height,
       });
-  
+
       newMessage
         .save()
         .then((savedMessage) => {

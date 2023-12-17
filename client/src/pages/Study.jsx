@@ -52,7 +52,7 @@ const Study = () => {
               className="lesson-btn text-2xl font-bold xl:h-[222px] sm:h-[163px] shadow-lg rounded-3xl"
               onClick={() => handleClick("1")}
             >
-              <div className="grid grid-flow-row -mt-5">
+              <div className="grid grid-flow-row -mt-4">
                 <span className="text-3xl">演習システム</span>
               </div>
             </button>
@@ -67,7 +67,7 @@ const Study = () => {
               className="lesson-btn text-2xl font-bold xl:h-[220px] sm:h-[163px] shadow-lg rounded-3xl"
               onClick={() => handleClick("2")}
             >
-              <div className="grid grid-flow-row -mt-5">
+              <div className="grid grid-flow-row -mt-4">
                 <span className="text-3xl">復習システム</span>
               </div>
             </button>

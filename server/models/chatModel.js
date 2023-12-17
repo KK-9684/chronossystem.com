@@ -19,6 +19,12 @@ const chatSchema = new mongoose.Schema({
   image: {
     type: String,
   },
+  width: {
+    type: String,
+  },
+  height: {
+    type: String,
+  },
   created: {
     type: Date,
     default: Date.now,
