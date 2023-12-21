@@ -43,7 +43,7 @@ const Unit = () => {
           <span className="text-cblue font-bold text-3xl">解説システム</span>
         )}
       </div>
-      <div className="grid justify-center items-center h-[85vh]">
+      <div className="grid justify-center items-center h-[85vh] pb-10">
         <div className="grid grid-cols-2 gap-x-8 gap-y-8">
           {data[problem].map((el, index) => {
             return (

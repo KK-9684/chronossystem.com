@@ -357,7 +357,7 @@ function Chat() {
     // eslint-disable-next-line
   }, []);
 
-  const containerHeight = window.innerHeight > 1000 ? "70vh" : "64vh";
+  const containerHeight = window.innerHeight > 1000 ? "69vh" : "55vh";
 
   return (
     <div>
@@ -366,14 +366,14 @@ function Chat() {
           level !== "user" ? "-mt-[60px]" : ""
         } grid grid-flow-row justify-center bg-gradient-to-b from-[#0EA5E9] w-[100vw] h-[100vh] z-10 pointer-events-none`}
       >
-        <div className="p-10 pt-[60px] grid grid-flow-col items-center">
+        <div className="p-10 pt-[65px] grid grid-flow-col items-center">
           {level === "user" ? (
             ""
           ) : width < 1024 ? (
             <div>
               <div
                 className={`${
-                  window.innerHeight > 1000 ? "h-[67vh]" : "h-[62vh]"
+                  window.innerHeight > 1024 ? "h-[67vh]" : "h-[62vh]"
                 } w-[300px] bg-white shadow-xl overflow-y-auto z-20 px-3 py-5 rounded-2xl mr-10 pointer-events-auto absolute top-16 ${
                   isList ? "" : "hidden"
                 }`}
@@ -420,7 +420,7 @@ function Chat() {
               })}
             </div>
           )}
-          <div className="w-[650px] pointer-events-auto">
+          <div className="w-[640px] pointer-events-auto">
             <Scrollbar
               noScrollX
               ref={scrollContainerRef}

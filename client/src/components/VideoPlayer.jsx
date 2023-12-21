@@ -11,7 +11,7 @@ const VideoPlayer = () => {
 
   function findClosestCommonMultiple(a, b, target) {
     const lcm = (a * b) / findGCD(a, b);
-    const closestMultiple = Math.round(target / lcm) * lcm;
+    const closestMultiple = Math.floor(target / lcm) * lcm;
     return closestMultiple;
   }
 
@@ -27,7 +27,7 @@ const VideoPlayer = () => {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
       let mHeight, mWidth;
-      if (screenWidth * 0.5625 > screenHeight) {
+      if (screenWidth * 0.5625 >= screenHeight) {
         mHeight = findClosestCommonMultiple(16, 9, screenHeight);
         mWidth = (mHeight * 16) / 9;
       } else {
@@ -53,11 +53,6 @@ const VideoPlayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleVideoEnded = () => {
-    playerRef.current.seekTo(0);
-    playerRef.current.pause();
-  };
-
   return (
     <>
       <div
@@ -80,10 +75,10 @@ const VideoPlayer = () => {
               playerOptions: {
                 quality: "1080p",
                 responsive: true,
+                loop: 1,
               },
             },
           }}
-          onEnded={handleVideoEnded}
         ></Player>
       </div>
     </>

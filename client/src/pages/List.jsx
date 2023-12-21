@@ -61,8 +61,8 @@ const List = () => {
     const updateDimensions = () => {
       const maxWidth = window.innerWidth;
       setWidth(Math.floor(maxWidth));
-      setsWidth(Math.floor(maxWidth / 3.5));
-      setxWidth(Math.floor(maxWidth / 2.5));
+      setsWidth(Math.floor(maxWidth / 4.5));
+      setxWidth(Math.floor(maxWidth / 3.5));
     };
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
@@ -80,8 +80,8 @@ const List = () => {
       <div className="grid justify-center">
         <div
           className={`${
-            width > 1280 ? "grid-cols-3" : "grid-cols-2"
-          } grid gap-10 mt-20 h-[200px] overscroll-auto`}
+            width > 1280 ? "grid-cols-4" : "grid-cols-3"
+          } grid gap-8 mt-20 h-[200px] overscroll-auto`}
         >
           {data.length === 0
             ? ""
