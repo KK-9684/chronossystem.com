@@ -231,7 +231,7 @@ const PDFViewer = ({ pdfFile }) => {
               key={renderedPageNumber}
               pageNumber={renderedPageNumber}
               scale={1}
-              devicePixelRatio={1.0}
+              devicePixelRatio={1.03}
               canvasBackground="#000000"
               width={width}
               // height={height}
@@ -243,7 +243,7 @@ const PDFViewer = ({ pdfFile }) => {
             key={pageNumber}
             pageNumber={pageNumber}
             scale={1}
-            devicePixelRatio={1.0}
+            devicePixelRatio={1.03}
             canvasBackground="#000000"
             width={width}
             // height={height}

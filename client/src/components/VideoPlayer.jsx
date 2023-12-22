@@ -66,13 +66,8 @@ const VideoPlayer = () => {
   }, []);
 
   const handleVideoEnd = () => {
+    playerRef.current.seekTo(0);
     playerRef.current.pause();
-  };
-
-  const handleProgress = (e) => {
-    if (e.played > 0.95 && playerRef.current) {
-      playerRef.current.seekTo(0);
-    }
   };
 
   return (
@@ -99,8 +94,6 @@ const VideoPlayer = () => {
               },
             },
           }}
-          onStart={handleVideoEnd}
-          onProgress={handleProgress}
           onEnded={handleVideoEnd}
         ></Player>
       </div>
