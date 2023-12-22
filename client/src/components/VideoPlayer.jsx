@@ -10,16 +10,28 @@ const VideoPlayer = () => {
   const [height, setHeight] = useState(0);
 
   function findClosestCommonMultiple(a, b, target) {
-    const lcm = (a * b) / findGCD(a, b);
-    const closestMultiple = Math.floor(target / lcm) * lcm;
+    const lcm = calculateLCM(a, b);
+    let closestMultiple = Math.floor(target / lcm) * lcm;
+    if (closestMultiple > target) {
+      closestMultiple -= lcm;
+    }
+
     return closestMultiple;
   }
 
-  function findGCD(a, b) {
-    if (b === 0) {
-      return a;
+  function calculateLCM(a, b) {
+    // Calculate the gcd using Euclid's algorithm
+    function calculateGCD(a, b) {
+      if (b === 0) {
+        return a;
+      } else {
+        return calculateGCD(b, a % b);
+      }
     }
-    return findGCD(b, a % b);
+
+    const gcd = calculateGCD(a, b);
+    const lcm = (a * b) / gcd;
+    return lcm;
   }
 
   useEffect(() => {
@@ -53,6 +65,16 @@ const VideoPlayer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleVideoEnd = () => {
+    playerRef.current.pause();
+  };
+
+  const handleProgress = (e) => {
+    if (e.played > 0.95 && playerRef.current) {
+      playerRef.current.seekTo(0);
+    }
+  };
+
   return (
     <>
       <div
@@ -74,11 +96,12 @@ const VideoPlayer = () => {
             vimeo: {
               playerOptions: {
                 quality: "1080p",
-                responsive: true,
-                loop: 1,
               },
             },
           }}
+          onStart={handleVideoEnd}
+          onProgress={handleProgress}
+          onEnded={handleVideoEnd}
         ></Player>
       </div>
     </>
