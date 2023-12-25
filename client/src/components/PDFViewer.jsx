@@ -22,6 +22,7 @@ const PDFViewer = ({ pdfFile }) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [renderedPageNumber, setRenderedPageNumber] = useState(null);
   const [isShow, setIsShow] = useState(false);
+  const [isDevice , setIsDevice] = useState(false);
 
   useEffect(() => {
     let ratio = 0;
@@ -54,6 +55,14 @@ const PDFViewer = ({ pdfFile }) => {
       setWidth(Math.floor(maxWidth));
       setHeight(Math.floor(maxHeight));
     };
+    // -------------------
+      const userAgent = navigator.userAgent.toLowerCase();
+
+      // Check for common keywords indicating a computer
+      setIsDevice(/windows nt|macintosh/.test(userAgent))
+
+
+    // ---------
 
     updateDimensions();
     window.addEventListener("resize", updateDimensions);
@@ -231,7 +240,7 @@ const PDFViewer = ({ pdfFile }) => {
               key={renderedPageNumber}
               pageNumber={renderedPageNumber}
               scale={1}
-              devicePixelRatio={1.03}
+              devicePixelRatio={isDevice?1.63:1.62}
               canvasBackground="#000000"
               width={width}
               // height={height}
@@ -243,7 +252,7 @@ const PDFViewer = ({ pdfFile }) => {
             key={pageNumber}
             pageNumber={pageNumber}
             scale={1}
-            devicePixelRatio={1.03}
+            devicePixelRatio={isDevice?1.63:1.62}
             canvasBackground="#000000"
             width={width}
             // height={height}
